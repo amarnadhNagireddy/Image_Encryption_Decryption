@@ -55,4 +55,3 @@ def manipulate_image(image_path):
     encrypted_image_io.seek(0)
 
     return encrypted_image_io
-
