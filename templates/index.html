@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Encryption & Decryption</title>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Image Encryption & Decryption</h1>
+        <hr>
+        
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs" id="imageTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="encrypt-tab" data-bs-toggle="tab" href="#encrypt" role="tab" aria-controls="encrypt" aria-selected="true">Encrypt Image</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="decrypt-tab" data-bs-toggle="tab" href="#decrypt" role="tab" aria-controls="decrypt" aria-selected="false">Decrypt Image</a>
+            </li>
+        </ul>
+
+        <!-- Tab content -->
+        <div class="tab-content mt-4" id="imageTabsContent">
+            <div class="tab-pane fade show active" id="encrypt" role="tabpanel" aria-labelledby="encrypt-tab">
+                <h3>Encrypt Image</h3>
+                <form action="/encrypt" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="encrypt-image" class="form-label">Select Image to Encrypt</label>
+                        <input class="form-control" type="file" name="image" id="encrypt-image" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Encrypt</button>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="decrypt" role="tabpanel" aria-labelledby="decrypt-tab">
+                <h3>Decrypt Image</h3>
+                <form action="/decrypt" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="decrypt-image" class="form-label">Select Image to Decrypt</label>
+                        <input class="form-control" type="file" name="image" id="decrypt-image" required>
+                    </div>
+                    <button class="btn btn-success" type="submit">Decrypt</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (necessary for tabs) -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
