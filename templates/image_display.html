@@ -3,34 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Encryption & Decryption</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <title>Image Display</title>
+    <style>
+        .btn{
+            padding: 10px 20px; 
+            font-size: 16px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Image Encryption & Decryption</h1>
-        <hr>
-        
-        <div style="display: flex; justify-content: space-between;">
-            <!-- Input Image -->
-            <div>
-                <h3>Input Image</h3>
-                <img src="{{ url_for('uploaded_file', filename=input_image) }}" style="max-width: 45%; max-height: 300px;">
-            </div>
+    <a href="/" ><button class="btn">Go Back to Main Page</button></a>
 
-            <!-- Output Image -->
-            <div>
-                <h3>Output Image</h3>
-                <img src="{{ url_for('uploaded_file', filename=output_image) }}" style="max-width: 45%; max-height: 300px;">
-            </div>
-        </div>
-        
-        <!-- Download Button -->
-        <div class="mt-3">
-            <a href="{{ url_for('uploaded_file', filename=output_image) }}" class="btn btn-success" download>Download Output Image</a>
-        </div>
+    <div >
+
+    <div>
+    <!-- Input Image Section -->
+    <h3>Uploaded Image</h3>
+    <img src="{{ input_image }}" alt="Input Image">
+    <br>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <div>
+    <!-- Output Image Section -->
+    <h3>
+        {% if operation == 'encrypt' %}
+            Encrypted Image
+        {% elif operation == 'decrypt' %}
+            Decrypted Image
+        {% else %}
+            Output Image
+        {% endif %}
+    </h3>
+    <img src="{{ output_image }}" alt="Output Image">
+</div>
+</div>
+    <br>
+    <!-- Download Output Image -->
+    <a href="{{ output_image }}" download="output_image.png">
+        <button class="btn">Download Image</button>
+    </a>
 </body>
 </html>
