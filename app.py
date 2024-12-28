@@ -1,21 +1,14 @@
-from flask import Flask, request, render_template, send_file, redirect, url_for, send_from_directory
-from image_encryption_decryption.manipulate import manipulate_image
-
-import os
-
+from flask import Flask, request, render_template, send_file, redirect, url_for
+from manipulate import manipulate_image
+import io
+import base64
 app = Flask(__name__)
-
-# Folder to store uploaded and processed files
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure the folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
 
 @app.route('/encrypt', methods=['POST'])
 def encrypt():
@@ -23,22 +16,29 @@ def encrypt():
         return "No file uploaded", 400
 
     file = request.files['image']
-    
+
     if file.filename == '':
         return "No file selected", 400
 
     try:
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(image_path)
+        # Read the uploaded image into memory
+        image_data = file.read()
+        
+        # Pass the image data for manipulation (encryption)
+        encrypted_image_io = manipulate_image(io.BytesIO(image_data))
 
-        encrypted_image_io = manipulate_image(image_path)
-        encrypted_path = os.path.join(app.config['UPLOAD_FOLDER'], f'encrypted_{file.filename}')
+        # Convert the input and output images to Base64 for rendering
+        input_image_base64 = base64.b64encode(image_data).decode('utf-8')
+        output_image_base64 = base64.b64encode(encrypted_image_io.getvalue()).decode('utf-8')
 
-        with open(encrypted_path, 'wb') as f:
-            f.write(encrypted_image_io.getvalue())
+        # Render the preview page with in-memory images
+        return render_template(
+    'image_display.html',
+    input_image=f"data:image/png;base64,{input_image_base64}",
+    output_image=f"data:image/png;base64,{output_image_base64}",
+    operation='encrypt'  # or 'decrypt' based on the route
+)
 
-        # Redirect to the page that displays images
-        return render_template('image_display.html', input_image=file.filename, output_image=f'encrypted_{file.filename}')
 
     except Exception as e:
         return f"Error during encryption: {str(e)}", 500
@@ -54,38 +54,42 @@ def decrypt():
         return "No file selected", 400
 
     try:
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(image_path)
+        # Read the uploaded image into memory
+        image_data = file.read()
 
-        decrypted_image_io = manipulate_image(image_path)
-        decrypted_path = os.path.join(app.config['UPLOAD_FOLDER'], f'decrypted_{file.filename}')
+        # Pass the image data for manipulation (decryption)
+        decrypted_image_io = manipulate_image(io.BytesIO(image_data))
 
-        with open(decrypted_path, 'wb') as f:
-            f.write(decrypted_image_io.getvalue())
+        # Convert the input and output images to Base64 for rendering
+        input_image_base64 = base64.b64encode(image_data).decode('utf-8')
+        output_image_base64 = base64.b64encode(decrypted_image_io.getvalue()).decode('utf-8')
 
-        # Redirect to the page that displays images
-        return render_template('image_display.html', input_image=file.filename, output_image=f'decrypted_{file.filename}')
+        # Render the preview page with in-memory images
+        return render_template(
+    'image_display.html',
+    input_image=f"data:image/png;base64,{input_image_base64}",
+    output_image=f"data:image/png;base64,{output_image_base64}",
+    operation='decrypt'  # or 'decrypt' based on the route
+)
+
 
     except Exception as e:
         return f"Error during decryption: {str(e)}", 500
 
+@app.route('/download_image/<operation>', methods=['POST'])
+def download_image(operation):
+    try:
+        if operation == 'encrypt':
+            file = request.files['image']
+            encrypted_image_io = manipulate_image(io.BytesIO(file.read()))
+            return send_file(encrypted_image_io, as_attachment=True, download_name='encrypted_image.png')
 
-
-@app.route('/show_images')
-def show_images():
-    input_image = request.args.get('input_image')
-    output_image = request.args.get('output_image')
-    
-    return render_template('image_display.html', input_image=file.filename, output_image=f'encrypted_{file.filename}')
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-@app.route('/download_image/<filename>')
-def download_image(filename):
-    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+        elif operation == 'decrypt':
+            file = request.files['image']
+            decrypted_image_io = manipulate_image(io.BytesIO(file.read()))
+            return send_file(decrypted_image_io, as_attachment=True, download_name='decrypted_image.png')
+    except Exception as e:
+        return f"Error during download: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True)
