@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Encryption & Decryption</title>
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Image Encryption & Decryption</h1>
         <hr>
-        
+
         <!-- Tab navigation -->
         <ul class="nav nav-tabs" id="imageTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -30,7 +28,8 @@
                 <form action="/encrypt" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="encrypt-image" class="form-label">Select Image to Encrypt</label>
-                        <input class="form-control" type="file" name="image" id="encrypt-image" required>
+                        <input class="form-control" type="file" name="image" id="encrypt-image" accept="image/*" required>
+                        <img id="preview-encrypt" class="img-fluid mt-3" style="max-width: 100%; display: none;">
                     </div>
                     <button class="btn btn-primary" type="submit">Encrypt</button>
                 </form>
@@ -40,7 +39,8 @@
                 <form action="/decrypt" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="decrypt-image" class="form-label">Select Image to Decrypt</label>
-                        <input class="form-control" type="file" name="image" id="decrypt-image" required>
+                        <input class="form-control" type="file" name="image" id="decrypt-image" accept="image/*" required>
+                        <img id="preview-decrypt" class="img-fluid mt-3" style="max-width: 100%; display: none;">
                     </div>
                     <button class="btn btn-success" type="submit">Decrypt</button>
                 </form>
@@ -48,9 +48,35 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS (necessary for tabs) -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Preview selected image for encryption
+        document.getElementById('encrypt-image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('preview-encrypt');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Preview selected image for decryption
+        document.getElementById('decrypt-image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('preview-decrypt');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
 </html>
